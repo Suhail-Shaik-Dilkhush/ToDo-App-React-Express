@@ -1,0 +1,17 @@
+name: Deploying front end and backend
+on: push
+jobs:
+  deploying_code:
+    runs-on: ubuntu-latest
+    steps:
+      - name: preparing github instance with all dependencies
+        run: |
+          sudo apt install git && ansible && aws-cli && python3
+          sudo pip3 install boto3
+
+      - name: printing the output of each command if installed or not
+        run: |
+          git --version
+          aws-cli --version
+          python3 --version
+          pip show boto3
