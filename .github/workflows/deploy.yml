@@ -6,8 +6,7 @@ jobs:
     steps:
       - name: preparing github instance with all dependencies
         run: |
-          sudo apt install git && ansible && aws-cli && python3
-          sudo pip3 install boto3
+          sudo apt install -y ansible
 
       - name: printing the output of each command if installed or not
         run: |
