@@ -11,6 +11,6 @@ jobs:
       - name: printing the output of each command if installed or not
         run: |
           git --version
-          aws-cli --version
+          aws --version
           python3 --version
           pip show boto3
