@@ -6,15 +6,14 @@
   environment:
     anisble_ssh_private_key_file: ~/.ssh/ansible_key.pem
     host_key_checking: false
-    aws_region: us-east-1
-    aws_access_key_id: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
-    aws_secret_access_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
-    ansible_user: ec2-user
+    AWS_REGION: us-east-1
+    AWS_ACCESS_KEY_ID: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
+    AWS_SECRET_ACCESS_KEY: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
 
   vars:
     mongo_uri: "{{ lookup('env', 'MONGO_URI')}}"
     port: "{{ lookup('env', 'PORT') }}"
-    ansible_user: "{{ lookup('env', 'ansible_user') }}"
+    ansible_user: "ec2-user"
 
   roles:
     - ec2_launch

@@ -13,14 +13,6 @@ jobs:
           sudo apt install -y \
           ansible
 
-      - name: printing the output of each command if installed or not
-        run: |
-          git --version
-          aws --version
-          python3 --version
-          pip show boto3
-          ansible --version
-
       - name: clonging the repo on to the instance
         uses: actions/checkout@v2
 
