@@ -58,7 +58,7 @@
 
 - name: printing key
   command: cat /home/runner/ansible_key.pem
-  when: ec2_key is defined
+  when: key_exists.keypairs | length == 0
 
 - name: getting ec2 instance info
   amazon.aws.ec2_instance_info:
