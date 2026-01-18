@@ -46,7 +46,7 @@
 
 - name: debug of key_pair
   debug:
-    vars: key_exists
+    var: key_exists
 
 - name: creating a key pair
   amazon.aws.ec2_key:
