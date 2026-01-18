@@ -71,6 +71,7 @@
 - name: printing key
   debug:
     var: private
+  when: private is defined
 
 - name: getting ec2 instance info
   amazon.aws.ec2_instance_info:
@@ -137,12 +138,12 @@
 - name: copying the .env template to the backend folder
   template:
     src: .env.j2
-    dest: ./todo-backend/
+    dest: ./todo-backend/.env
 
 - name: replacing the config.js file in the frontend folder
   template:
     src: config.js.j2
-    dest: ./todo-frontend/config/
+    dest: ./todo-frontend/config/config.js
 
 - name: building the front end code
   package:
@@ -199,7 +200,7 @@
   delegate_to: "{{ groups['dynamic_hosts'][0] }}"
   template:
     src: todo.j2
-    dest: /etc/nginx/sites-enabled
+    dest: /etc/nginx/sites-enabled/todo-site
 
 - name: running and enabling the nginx
   become: true
