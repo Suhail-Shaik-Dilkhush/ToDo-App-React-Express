@@ -1,0 +1,15 @@
+server {
+
+    listen 80
+    
+    serverName {{ec2_instance.instances[0].public_ip_address}}
+
+    root /var/www/html
+
+    index index.html 
+
+    location / {
+        try_files $uri /index.html
+    }
+
+}

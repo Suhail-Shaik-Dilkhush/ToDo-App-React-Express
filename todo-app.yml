@@ -1,0 +1,16 @@
+---
+- name: Triggering ec2 role
+  hosts: localhost
+  become: yes
+
+  environment:
+    ansible_user: ec2-user
+    anisble_ssh_private_key_file: ~/.ssh/ansible_key.pem
+    host_key_checking: false
+
+  vars:
+    mongo_uri: "{{ lookup('env', 'MONGO_URI')}}"
+    port: "{{ lookup('env', 'PORT') }}"
+
+  roles:
+    - ec2_launch

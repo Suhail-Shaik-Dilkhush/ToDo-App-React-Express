@@ -1,0 +1,191 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for ec2_launch
+- name: printing the variables
+  debug:
+    msg:
+      region: "{{ region }}"
+      user: "{{ansible_user}}"
+
+- name: creating a security group with egress rule
+  amazon.aws.ec2_security_group:
+    description: "Security group to allow all outbound traffic"
+    name: Ansilbe_Lab_Instnace_SG
+    region: "{{region}}"
+    rules_egress:
+      - cidr_ip: 0.0.0.0/0
+        proto: all
+        rule_desc: "Rule to allow all the traffic going outside of instance"
+    state: present
+
+- name: adding the security group wiht ingress rules
+  amazon.aws.ec2_security_group:
+    description: "Security group to allow ports 80, 22 to the internet on the instance"
+    name: Ansilbe_Lab_Instnace_SG
+    region: "{{region}}"
+    rules:
+      - cidr_ip: 0.0.0.0/0
+        proto: tcp
+        from_port: "{{item}}"
+        to_port: "{{item}}"
+        rule_desc: "Rule to allow ingress traffic"
+    state: present
+  loop: "{{ports}}"
+  register: ec2_securitygroup
+
+- name: printing the security group info
+  debug:
+    var: ec2_securitygroup
+
+- name: checking if the key pair exists
+  amazon.aws.ec2_key_info:
+    names:
+      - ansible_keypair.pem
+    region: "{{ region }}"
+  register: key_exists
+
+- name: creating a key pair
+  amazon.aws.ec2_key:
+    file_name: ~/.ssh/ansible_keypair.pem
+    force: true
+    key_type: "rsa"
+    name: ansible_keypair.pem
+    region: "{{region}}"
+  register: ec2_key
+  when: key_exists is not defined
+
+- name: adding the key pair to a home ssh
+  copy:
+    content: ${{ secrets.key_pair }}
+    dest: ~/.ssh/ansible_key.pem
+  when: key_exists is defined
+
+- name: printing the stored key to see it
+  debug:
+    var: ec2_key
+  when: key_exists is not defined
+
+- name: To create an ec2 instance
+  amazon.aws.ec2_instance:
+    exact_count: 1
+    filters:
+      "tag:Name": Ansible_Instance
+    image_id: "{{ami_id}}"
+    instance_type: t2.micro
+    key_name: ansible_keypair.pem
+    name: Ansible_Instance
+    region: "{{region}}"
+    security_groups:
+      - "{{ec2_securitygroup.results[0].group_id}}"
+    tags:
+      Name: Ansible_Instance
+  register: ec2_instance
+
+- name: waiting for the instance to come up
+  wait_for:
+    host: "{{ ec2_instance.instances[0].public_ip_address }}"
+    port: 22
+    delay: 10
+    timeout: 120
+    state: started
+  when: ec2_instance is defined & ec2_instance.instances | length > 0
+
+- name: adding the host to dynamic inventory
+  add_host:
+    name: "{{ ec2_instance.instances[0].public_ip_address }}"
+    ansible_host: "{{ ec2_instance.instances[0].public_ip_address }}"
+    ansible_user: ec2-user
+    groups: dynamic_hosts
+    ansible_ssh_private_key_file: ~/.ssh/ansible_key.pem
+  when:
+    - ec2_instance.instances[0].public_ip_address is defined
+    - ec2_instance.instances[0].state.name == 'running'
+
+- name: ensuring destination directroy
+  delegate_to: "{{ groups['dynamic_hosts'][0] }}"
+  file:
+    path: /var/copied-files
+    state: directory
+
+- name: copying the test file to the instance
+  delegate_to: "{{ groups['dynamic_hosts'][0] }}"
+  copy:
+    src: test-copy-file.yml
+    dest: /var/copied-files/test-copy-file.yml
+
+- name: copying the .env template to the backend folder
+  template:
+    src: .env.j2
+    dest: ./todo-backend/
+
+- name: replacing the config.js file in the frontend folder
+  template:
+    src: config.js.j2
+    dest: ./todo-frontend/config/
+
+- name: building the front end code
+  package:
+    name:
+      - npm
+      - nodejs
+
+- name: build
+  shell: |
+    cd ./todo-frontend/
+    npm run build
+
+- name: copying the files to instance
+  delegate_to: "{{ groups['dynamic_hosts'][0] }}"
+  rsync:
+    src: ./todo-frontend/build/*
+    dest: /var/www/html/
+
+- name: copying the backend to instance
+  delegate_to: "{{ groups['dynamic_hosts'][0] }}"
+  rsync:
+    src: ./todo-backend
+    dest: /home/ec2-user/
+
+- name: installing pm2 dependencies package on the instance host
+  block:
+    - name: install nodejs and npm
+      package:
+        name:
+          - nodejs
+          - npm
+  become: true
+  delegate_to: "{{ groups['dynamic_hosts'] | first }}"
+
+- name: installing the pm2 on the instance
+  block:
+    - npm:
+        name: pm2
+        global: yes
+        state: present
+  become: true
+  delegate_to: "{{ groups['dynamic_hosts'][0] }}"
+
+- name: installing nginx
+  package:
+    name: nginx
+
+- name: copying the nginx conf to the /etc/nginx/sites-enabled/
+  become: true
+  delegate_to: "{{ groups['dynamic_hosts'][0] }}"
+  template:
+    src: todo.j2
+    dest: /etc/nginx/sites-enabled
+
+- name: running and enabling the nginx
+  become: true
+  delegate_to: "{{ groups['dynamic_hosts'][0] }}"
+  service:
+    name: nginx
+    state: started
+    enabled: true
+
+- name: starting the backend service
+  delegate_to: "{{ groups['dynamic_hosts'][0] }}"
+  become: true
+  shell: |
+    pm2 start /home/ec2-user/todo-backend/start.js
