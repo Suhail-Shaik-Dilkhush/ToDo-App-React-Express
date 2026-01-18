@@ -2,7 +2,7 @@ server {
 
     listen 80;
     
-    serverName {{ec2_instance.instances[0].public_ip_address}};
+    server_name {{ec2_instance.instances[0].public_ip_address}};
 
     root /var/www/html;
 
