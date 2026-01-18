@@ -87,7 +87,9 @@
     ls ~/.ssh/ 
     pwd
     whoami
-    ls /home/runner/.ssh/
+    id runner
+    ls -la /home/runner/.ssh/
+    cat /home/runner/.ssh/ansible_key.pem
   register: output
 
 - name: seeing the output

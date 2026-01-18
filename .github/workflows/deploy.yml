@@ -18,6 +18,9 @@ jobs:
       - name: clonging the repo on to the instance
         uses: actions/checkout@v2
 
+      - name: checking user
+        run: whoami
+
       - name: running the playbook
         env:
           ANSIBLE_HOST_KEY_CHECKING: false
