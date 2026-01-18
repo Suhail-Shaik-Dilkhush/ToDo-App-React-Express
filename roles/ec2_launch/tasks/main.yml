@@ -145,7 +145,7 @@
 - name: replacing the config.js file in the frontend folder
   template:
     src: config.js.j2
-    dest: ./todo-frontend/config/config.js
+    dest: ./todo-frontend/src/config/config.js
 
 - name: building the front end code
   package:
