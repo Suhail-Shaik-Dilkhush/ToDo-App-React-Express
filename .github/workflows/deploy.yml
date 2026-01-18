@@ -1,5 +1,9 @@
 name: Deploying front end and backend
-on: push
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 jobs:
   deploying_code:
     runs-on: ubuntu-latest
