@@ -163,6 +163,7 @@
   copy:
     src: ./todo-backend
     dest: /home/ec2-user/
+  delegate_to: "{{ groups['dynamic_hosts'][0] }}"
 
 - name: installing pm2 dependencies package on the instance host
   block:
@@ -192,13 +193,14 @@
   copy:
     src: ./todo-frontend/build/
     dest: /var/www/html/
+  delegate_to: "{{ groups['dynamic_hosts'][0] }}"
 
-- name: copying the nginx conf to the /etc/nginx/sites-enabled/
+- name: copying the nginx conf to the /etc/nginx/
   become: true
   delegate_to: "{{ groups['dynamic_hosts'][0] }}"
   template:
     src: todo.j2
-    dest: /etc/nginx/sites-enabled/todo-site
+    dest: /etc/nginx/conf.d/default.conf
 
 - name: running and enabling the nginx
   become: true
