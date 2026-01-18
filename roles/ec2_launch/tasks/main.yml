@@ -87,6 +87,7 @@
     ls ~/.ssh/ 
     pwd
     whoami
+    ls /home/runner/.ssh/
   register: output
 
 - name: seeing the output
