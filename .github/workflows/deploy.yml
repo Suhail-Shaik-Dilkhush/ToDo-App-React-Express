@@ -20,6 +20,7 @@ jobs:
 
       - name: running the playbook
         env:
+          ANSIBLE_HOST_KEY_CHECKING: false
           AWS_ACCESS_KEY_ID: ${{secrets.access_key_id}}
           AWS_SECRET_ACCESS_KEY: ${{secrets.access_key}}
           AWS_REGION: us-east-1
