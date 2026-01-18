@@ -46,24 +46,9 @@
     region: "{{ region }}"
   register: key_exists
 
-- name: ensuring .ssh directory
-  file:
-    path: /home/runner/.ssh
-    state: directory
-    mode: "0700"
-
-- name: adding the key pair to a home ssh
-  copy:
-    content: "{{ key }}"
-    dest: /home/runner/.ssh/ansible_key.pem
-    owner: runner
-    group: runner
-    mode: "0600"
-  when: key_exists.keypairs | length > 0
-
 - name: creating a key pair
   amazon.aws.ec2_key:
-    file_name: /home/runner/.ssh/ansible_keypair.pem
+    file_name: /home/runner/ansible_key.pem
     force: true
     key_type: "rsa"
     name: ansible_keypair.pem
@@ -71,30 +56,9 @@
   register: ec2_key
   when: key_exists.keypairs | length == 0
 
-- name: printing the stored key to see it
-  command: |
-    cat ~/.ssh/ansible_keypair.pem
-  when: key_exists.keypairs | length == 0
-  register: private
-
 - name: printing key
-  debug:
-    var: private
-  when: private is defined
-
-- name: seeing the key
-  shell: |
-    ls ~/.ssh/ 
-    pwd
-    whoami
-    id runner
-    ls -la /home/runner/.ssh/
-    cat /home/runner/.ssh/ansible_key.pem
-  register: output
-
-- name: seeing the output
-  debug:
-    var: output
+  command: cat /home/runner/ansible_key.pem
+  when: ec2_key is defined
 
 - name: getting ec2 instance info
   amazon.aws.ec2_instance_info:

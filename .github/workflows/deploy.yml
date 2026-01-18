@@ -21,6 +21,12 @@ jobs:
       - name: checking user
         run: whoami
 
+      - name: adding the ssh key
+        run: |
+          mkdir ~/.ssh
+          echo "${{secrets.key}}" >> ~/.ssh/ansible_key.pem
+          chmod 600 ~/.ssh/ansible_key.pem
+
       - name: running the playbook
         env:
           ANSIBLE_HOST_KEY_CHECKING: false
@@ -29,5 +35,4 @@ jobs:
           AWS_REGION: us-east-1
           MONGO_URI: ${{secrets.mongo_uri}}
           PORT: ${{vars.port}}
-          key: ${{secrets.key_pair}}
         run: ansible-playbook todo-app.yml
