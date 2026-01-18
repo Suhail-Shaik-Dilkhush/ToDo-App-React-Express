@@ -108,7 +108,7 @@
     delay: 10
     timeout: 120
     state: started
-  when: ec2_instance is defined & ec2_instance.instances | length > 0
+  when: ec2_instance is defined and ec2_instance.instances | length > 0
 
 - name: adding the host to dynamic inventory
   add_host:
