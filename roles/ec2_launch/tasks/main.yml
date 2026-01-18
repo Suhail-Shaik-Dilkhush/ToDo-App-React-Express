@@ -136,15 +136,19 @@
 
 - name: copying the files to instance
   delegate_to: "{{ groups['dynamic_hosts'][0] }}"
-  rsync:
+  synchronize:
     src: ./todo-frontend/build/*
     dest: /var/www/html/
+    recursive: yes
+    delete: yes
 
 - name: copying the backend to instance
   delegate_to: "{{ groups['dynamic_hosts'][0] }}"
-  rsync:
+  synchronize:
     src: ./todo-backend
     dest: /home/ec2-user/
+    recursive: yes
+    delete: yes
 
 - name: installing pm2 dependencies package on the instance host
   block:
