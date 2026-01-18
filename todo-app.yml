@@ -9,6 +9,7 @@
     aws_region: us-east-1
     aws_access_key_id: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
     aws_secret_access_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
+    ansible_user: ec2-user
 
   vars:
     mongo_uri: "{{ lookup('env', 'MONGO_URI')}}"

@@ -1,5 +1,4 @@
 #SPDX-License-Identifier: MIT-0
 ---
 # vars file for ec2_launch
-ansible_user: ec2-user
 ansible_python_interpreter: /usr/bin/python3
