@@ -161,8 +161,8 @@
 
 - name: copying the files to instance
   ansible.posix.synchronize:
-    src: ./todo-frontend/build/*
-    dest: /home/ec2-user/var/www/html/
+    src: ./todo-frontend/build/
+    dest: /var/www/html/
     recursive: yes
   delegate_to: localhost
 
