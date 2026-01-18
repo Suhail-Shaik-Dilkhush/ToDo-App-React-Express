@@ -75,8 +75,8 @@
   when: private is defined
 
 - name: seeing the key
-  command: |
-    ls ~/.ssh/
+  shell: |
+    ls ~/.ssh/ 
     pwd
   register: output
 
