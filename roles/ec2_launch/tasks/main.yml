@@ -159,19 +159,10 @@
     npm install
     npm run build
 
-- name: copying the files to instance
-  ansible.posix.synchronize:
-    src: ./todo-frontend/build/
-    dest: /var/www/html/
-    recursive: yes
-  delegate_to: localhost
-
 - name: copying the backend to instance
-  ansible.posix.synchronize:
+  copy:
     src: ./todo-backend
     dest: /home/ec2-user/
-    recursive: yes
-  delegate_to: localhost
 
 - name: installing pm2 dependencies package on the instance host
   block:
@@ -195,6 +186,12 @@
 - name: installing nginx
   package:
     name: nginx
+  delegate_to: "{{ groups['dynamic_hosts'] | first }}"
+
+- name: copying the files to instance
+  copy:
+    src: ./todo-frontend/build/
+    dest: /var/www/html/
 
 - name: copying the nginx conf to the /etc/nginx/sites-enabled/
   become: true
@@ -210,6 +207,12 @@
     name: nginx
     state: started
     enabled: true
+
+- name: installing modules in the backend folder
+  delegate_to: "{{ groups['dynamic_hosts'][0] }}"
+  shell: |
+    cd /home/ec2-user/todo-backend
+    npm install
 
 - name: starting the backend service
   delegate_to: "{{ groups['dynamic_hosts'][0] }}"
