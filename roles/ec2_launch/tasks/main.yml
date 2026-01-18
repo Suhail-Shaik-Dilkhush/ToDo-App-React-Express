@@ -77,13 +77,14 @@
     exact_count: 1
     filters:
       "tag:Name": Ansible_Instance
+      instance-state-name: running
     image_id: "{{ami_id}}"
     instance_type: t2.micro
     key_name: ansible_keypair.pem
     name: Ansible_Instance
     region: "{{region}}"
     security_groups:
-      - "{{ec2_securitygroup.group_id}}"
+      - "{{ec2_securitygroup.group_name}}"
     tags:
       Name: Ansible_Instance
   register: ec2_instance
