@@ -64,8 +64,13 @@
 
 - name: printing the stored key to see it
   command: |
-    cat ~/.ssh/ansible_keypair.pem
+    echo ~/.ssh/ansible_keypair.pem
   when: key_exists.keypairs | length == 0
+  register: private
+
+- name: printing key
+  debug:
+    var: private
 
 - name: To create an ec2 instance
   amazon.aws.ec2_instance:
@@ -78,7 +83,7 @@
     name: Ansible_Instance
     region: "{{region}}"
     security_groups:
-      - "{{ec2_securitygroup.results[0].group_id}}"
+      - "{{ec2_securitygroup.group_id}}"
     tags:
       Name: Ansible_Instance
   register: ec2_instance
