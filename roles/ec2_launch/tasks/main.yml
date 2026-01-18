@@ -50,6 +50,7 @@
   copy:
     content: "{{ key }}"
     dest: ~/.ssh/ansible_key.pem
+    mode: "0600"
   when: key_exists.keypairs | length > 0
 
 - name: creating a key pair
