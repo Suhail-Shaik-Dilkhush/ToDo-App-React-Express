@@ -160,20 +160,18 @@
     npm run build
 
 - name: copying the files to instance
-  delegate_to: "{{ groups['dynamic_hosts'][0] }}"
-  synchronize:
+  ansible.posix.synchronize:
     src: ./todo-frontend/build/*
-    dest: /var/www/html/
+    dest: /home/ec2-user/var/www/html/
     recursive: yes
-    delete: yes
+  delegate_to: localhost
 
 - name: copying the backend to instance
-  delegate_to: "{{ groups['dynamic_hosts'][0] }}"
-  synchronize:
+  ansible.posix.synchronize:
     src: ./todo-backend
     dest: /home/ec2-user/
     recursive: yes
-    delete: yes
+  delegate_to: localhost
 
 - name: installing pm2 dependencies package on the instance host
   block:
