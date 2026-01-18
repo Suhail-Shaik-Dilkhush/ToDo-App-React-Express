@@ -150,8 +150,6 @@
   file:
     path: /var/copied-files
     state: directory
-  env:
-    ANSIBLE_HOST_KEY_VERIFICATION: "false"
 
 - name: copying the test file to the instance
   delegate_to: "{{ groups['dynamic_hosts'][0] }}"
