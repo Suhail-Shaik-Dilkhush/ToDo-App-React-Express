@@ -74,6 +74,16 @@
     var: private
   when: private is defined
 
+- name: seeing the key
+  command: |
+    ls ~/.ssh/
+    pwd
+  register: output
+
+- name: seeing the output
+  debug:
+    var: output
+
 - name: getting ec2 instance info
   amazon.aws.ec2_instance_info:
     filters:
