@@ -64,7 +64,7 @@
 
 - name: printing the stored key to see it
   command: |
-    echo ~/.ssh/ansible_keypair.pem
+    cat ~/.ssh/ansible_keypair.pem
   when: key_exists.keypairs | length == 0
   register: private
 
@@ -77,7 +77,6 @@
     exact_count: 1
     filters:
       "tag:Name": Ansible_Instance
-      instance-state-name: running
     image_id: "{{ami_id}}"
     instance_type: t2.micro
     key_name: ansible_keypair.pem
