@@ -23,4 +23,5 @@ jobs:
           AWS_REGION: us-east-1
           MONGO_URI: ${{secrets.mongo_uri}}
           PORT: ${{vars.port}}
+          key: ${{secrets.key_pair}}
         run: ansible-playbook todo-app.yml
