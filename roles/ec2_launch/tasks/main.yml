@@ -46,6 +46,12 @@
     region: "{{ region }}"
   register: key_exists
 
+- name: ensuring .ssh directory
+  file:
+    path: /home/runner/.ssh
+    state: directory
+    mode: "0700"
+
 - name: adding the key pair to a home ssh
   copy:
     content: "{{ key }}"
