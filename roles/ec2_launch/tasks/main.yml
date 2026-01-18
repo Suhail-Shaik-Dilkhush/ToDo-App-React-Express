@@ -34,6 +34,7 @@
         rule_desc: "Rule to allow all the traffic going outside of instance"
     state: present
   register: ec2_securitygroup
+  change_when: false
 
 - name: printing the security group info
   debug:
@@ -87,6 +88,7 @@
     tags:
       Name: Ansible_Instance
   register: ec2_instance
+  when: ec2_instances
 
 - name: waiting for the instance to come up
   wait_for:
