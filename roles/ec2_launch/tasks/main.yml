@@ -5,13 +5,13 @@
   debug:
     msg:
       region: "{{ region }}"
-      user: "{{ ansible_user }}"
+      user: "{{ ansible_user s}}"
 
 - name: creating a security group with egress rule
   amazon.aws.ec2_security_group:
     description: "Security group to allow all outbound traffic"
     name: Ansilbe_Lab_Instnace_SG
-    region: "{{region}}"
+    region: "{{ region }}"
     rules_egress:
       - cidr_ip: 0.0.0.0/0
         proto: all
