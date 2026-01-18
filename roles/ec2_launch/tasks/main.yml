@@ -44,9 +44,11 @@
     region: "{{ region }}"
   register: key_exists
 
-- name: debug of key_pair
-  debug:
-    var: key_exists
+- name: adding the key pair to a home ssh
+  copy:
+    content: "{{ key }}"
+    dest: ~/.ssh/ansible_key.pem
+  when: key_exists.keypairs | length > 0
 
 - name: creating a key pair
   amazon.aws.ec2_key:
@@ -56,18 +58,12 @@
     name: ansible_keypair.pem
     region: "{{region}}"
   register: ec2_key
-  when: key_exists is not defined
-
-- name: adding the key pair to a home ssh
-  copy:
-    content: "{{ key }}"
-    dest: ~/.ssh/ansible_key.pem
-  when: key_exists is defined
+  when: key_exists.keypairs | length == 0
 
 - name: printing the stored key to see it
   debug:
     var: ec2_key
-  when: key_exists is not defined
+  when: key_exists.keypairs | length == 0
 
 - name: To create an ec2 instance
   amazon.aws.ec2_instance:
