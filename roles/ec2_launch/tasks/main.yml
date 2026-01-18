@@ -7,30 +7,32 @@
       region: "{{ region }}"
       user: "{{ ansible_user }}"
 
-- name: creating a security group with egress rule
+- name: creating a security group with ingress and egress rules
   amazon.aws.ec2_security_group:
-    description: "Security group to allow all outbound traffic"
+    description: "Security group to allow ports 80, 22, 443 and all outbound traffic"
     name: Ansilbe_Lab_Instnace_SG
     region: "{{ region }}"
+    rules:
+      - cidr_ip: 0.0.0.0/0
+        proto: tcp
+        from_port: 80
+        to_port: 80
+        rule_desc: "Rule to allow HTTP traffic"
+      - cidr_ip: 0.0.0.0/0
+        proto: tcp
+        from_port: 22
+        to_port: 22
+        rule_desc: "Rule to allow SSH traffic"
+      - cidr_ip: 0.0.0.0/0
+        proto: tcp
+        from_port: 443
+        to_port: 443
+        rule_desc: "Rule to allow HTTPS traffic"
     rules_egress:
       - cidr_ip: 0.0.0.0/0
         proto: all
         rule_desc: "Rule to allow all the traffic going outside of instance"
     state: present
-
-- name: adding the security group wiht ingress rules
-  amazon.aws.ec2_security_group:
-    description: "Security group to allow ports 80, 22 to the internet on the instance"
-    name: Ansilbe_Lab_Instnace_SG
-    region: "{{region}}"
-    rules:
-      - cidr_ip: 0.0.0.0/0
-        proto: tcp
-        from_port: "{{item}}"
-        to_port: "{{item}}"
-        rule_desc: "Rule to allow ingress traffic"
-    state: present
-  loop: "{{ports}}"
   register: ec2_securitygroup
 
 - name: printing the security group info
@@ -61,8 +63,8 @@
   when: key_exists.keypairs | length == 0
 
 - name: printing the stored key to see it
-  debug:
-    var: ec2_key
+  command: |
+    cat ~/.ssh/ansible_keypair.pem
   when: key_exists.keypairs | length == 0
 
 - name: To create an ec2 instance
@@ -98,6 +100,8 @@
     groups: dynamic_hosts
     ansible_ssh_private_key_file: ~/.ssh/ansible_key.pem
   when:
+    - ec2_instance is defined
+    - ec2_instance.instances | length > 0
     - ec2_instance.instances[0].public_ip_address is defined
     - ec2_instance.instances[0].state.name == 'running'
 
