@@ -49,13 +49,13 @@
 - name: adding the key pair to a home ssh
   copy:
     content: "{{ key }}"
-    dest: ~/.ssh/ansible_key.pem
+    dest: /home/runner/ansible_key.pem
     mode: "0600"
   when: key_exists.keypairs | length > 0
 
 - name: creating a key pair
   amazon.aws.ec2_key:
-    file_name: ~/.ssh/ansible_keypair.pem
+    file_name: /home/runner/ansible_keypair.pem
     force: true
     key_type: "rsa"
     name: ansible_keypair.pem
@@ -142,7 +142,7 @@
     ansible_host: "{{ ec2_instance.instances[0].public_ip_address }}"
     ansible_user: ec2-user
     groups: dynamic_hosts
-    ansible_ssh_private_key_file: ~/.ssh/ansible_key.pem
+    ansible_ssh_private_key_file: /home/runner/ansible_key.pem
   when:
     - ec2_instance is defined
     - ec2_instance.instances | length > 0

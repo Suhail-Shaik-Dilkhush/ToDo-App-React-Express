@@ -4,7 +4,7 @@
   become: yes
 
   environment:
-    ansible_ssh_private_key_file: ~/.ssh/ansible_key.pem
+    ansible_ssh_private_key_file: /home/runner/ansible_key.pem
     ANSIBLE_HOST_KEY_CHECKING: "false"
     AWS_REGION: us-east-1
     AWS_ACCESS_KEY_ID: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
