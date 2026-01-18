@@ -101,6 +101,21 @@
   register: ec2_instance
   when: ec2_check.instances | length == 0
 
+- name: To create an ec2 instance
+  amazon.aws.ec2_instance:
+    exact_count: 1
+    filters:
+      "tag:Name": Ansible_Instance
+    image_id: "{{ami_id}}"
+    instance_type: t2.micro
+    key_name: ansible_keypair.pem
+    name: Ansible_Instance
+    region: "{{region}}"
+    tags:
+      Name: Ansible_Instance
+  register: ec2_instance
+  when: ec2_check.instances | length > 0
+
 - name: waiting for the instance to come up
   wait_for:
     host: "{{ ec2_instance.instances[0].public_ip_address }}"
